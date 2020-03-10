@@ -1,11 +1,23 @@
 import React from "react";
+import myAxios, { getAuthorizationHeaders } from "../axios";
+import makeToast from "../toast";
 
-export default function NewComment() {
+export default function NewComment({ id, getComments }) {
   const commentRef = React.createRef();
 
   const comment = () => {
-    console.log(commentRef.current.value);
-    // console.log(commentRef.current.value);
+    const formData = new FormData();
+    formData.append("text", commentRef.current.value);
+    myAxios
+      .post("/comment/" + id, formData, getAuthorizationHeaders())
+      .then(({ data }) => {
+        makeToast("success", data.message);
+        getComments();
+        commentRef.current.value = "";
+      })
+      .catch(err => {
+        makeToast("error", err.response.data.message);
+      });
   };
 
   return (

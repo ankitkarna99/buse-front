@@ -4,11 +4,12 @@ const baseURL = "http://localhost:7000";
 
 const myAxios = axios.create({ baseURL });
 
-const getAuthorizationHeaders = () => {
+const getAuthorizationHeaders = (multipart = false) => {
   const token = localStorage.getItem("token");
   return {
     headers: {
-      Authorization: "Bearer " + token
+      Authorization: "Bearer " + token,
+      "Content-Type": multipart ? "multipart/form-data" : null
     }
   };
 };

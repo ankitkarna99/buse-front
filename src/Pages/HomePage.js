@@ -1,63 +1,94 @@
 import React from "react";
 import Category from "../Components/Category";
 import Post from "../Components/Post";
-import table from "../Images/table.svg";
-import chair from "../Images/chair.svg";
-import bed from "../Images/bed.svg";
+import all from "../Images/all.svg";
 import myAxios, { baseURL, getAuthorizationHeaders } from "../axios";
 import { Link } from "react-router-dom";
 
 export default function HomePage() {
   const [categories, setCategories] = React.useState([]);
+  const [posts, setPosts] = React.useState([]);
+  const [activeCategory, setActiveCategory] = React.useState("All");
 
-  React.useEffect(() => {
+  const getPostsByCategory = categoryId => {
     myAxios
-      .get("/user/category", getAuthorizationHeaders())
-      .then(response => {
-        setCategories(response.data.category);
+      .get("/post/category/" + categoryId, getAuthorizationHeaders())
+      .then(({ data }) => {
+        setPosts(data);
       })
       .catch(err => {
         console.log(err);
       });
+  };
+
+  const getPosts = () => {
+    myAxios
+      .get("/post", getAuthorizationHeaders())
+      .then(({ data }) => {
+        setPosts(data);
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  };
+
+  React.useEffect(() => {
+    myAxios
+      .get("/category", getAuthorizationHeaders())
+      .then(response => {
+        setCategories(response.data);
+      })
+      .catch(err => {
+        console.log(err);
+      });
+    getPosts();
   }, []);
 
   return (
     <div className="homePage">
       <div className="categories">
         <h2>Categories</h2>
+        <span
+          onClick={() => {
+            setActiveCategory("All");
+            getPosts();
+          }}
+        >
+          <Category
+            picture={all}
+            category="All"
+            active={activeCategory === "All"}
+          />
+        </span>
 
         {categories.map(category => (
-          <Category
-            picture={baseURL + category.url}
-            category={category.name}
-            active={category.name === "All"}
-          />
+          <span
+            onClick={() => {
+              setActiveCategory(category.name);
+              getPostsByCategory(category._id);
+            }}
+          >
+            <Category
+              key={category._id}
+              picture={baseURL + category.image}
+              category={category.name}
+              active={activeCategory === category.name}
+            />
+          </span>
         ))}
       </div>
       <div className="posts">
-        <Link to="/home/postdetails">
-          <Post
-            title="Bed"
-            price={30000}
-            location="Pokhara"
-            rating="4"
-            image={bed}
-          />
-        </Link>
-        <Post
-          title="Table"
-          price={20000}
-          location="Jhapa"
-          rating="4.5"
-          image={table}
-        />
-        <Post
-          title="Chair"
-          price={10000}
-          location="Butwal"
-          rating="3"
-          image={chair}
-        />
+        {posts.map(post => (
+          <Link key={post._id} to={"/home/post/" + post._id}>
+            <Post
+              title={post.title}
+              price={post.price}
+              location={post.address}
+              rating="0"
+              image={baseURL + post.image}
+            />
+          </Link>
+        ))}
       </div>
     </div>
   );

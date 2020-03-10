@@ -1,8 +1,9 @@
 import React from "react";
 import myAxios, { getAuthorizationHeaders } from "../axios";
 import Button from "../Components/Button";
+import makeToast from "../toast";
 
-export default function NewPostPage() {
+export default function NewPostPage({ history }) {
   const [categories, setCategories] = React.useState([]);
   const titleRef = React.useRef();
   const addressRef = React.useRef();
@@ -14,10 +15,10 @@ export default function NewPostPage() {
 
   React.useEffect(() => {
     myAxios
-      .get("/user/category", getAuthorizationHeaders())
+      .get("/category", getAuthorizationHeaders())
       .then(response => {
         setCategories(
-          response.data.category.filter(category => category.name !== "All")
+          response.data.filter(category => category.name !== "All")
         );
       })
       .catch(err => {
@@ -25,11 +26,36 @@ export default function NewPostPage() {
       });
   }, []);
 
+  const newPost = e => {
+    e.preventDefault();
+
+    const formData = new FormData();
+    formData.append("title", titleRef.current.value);
+    formData.append("address", addressRef.current.value);
+    formData.append("price", priceRef.current.value);
+    formData.append("description", descriptionRef.current.value);
+    formData.append("condition", conditionRef.current.value);
+    formData.append("category", categoryRef.current.value);
+    formData.append("file", fileRef.current);
+
+    console.log(formData);
+
+    myAxios
+      .post("/post", formData, getAuthorizationHeaders(true))
+      .then(({ data }) => {
+        makeToast("success", data.message);
+        history.push("/home");
+      })
+      .catch(err => {
+        makeToast("error", err.response.data.message);
+      });
+  };
+
   return (
     <div style={{ paddingTop: "7rem" }}>
       <h3>Add Post</h3>
       <div style={{ width: "50%" }}>
-        <form action="" method="post">
+        <form action="" method="post" onSubmit={newPost}>
           <input
             type="text"
             className="text"
@@ -60,14 +86,16 @@ export default function NewPostPage() {
           <div style={{ height: "16px" }}></div>
           <select name="condition" className="text" ref={conditionRef}>
             <option value="Brand New">Brand New</option>
-            <option value="Brand New">Like New</option>
-            <option value="Brand New">Used</option>
+            <option value="Like New">Like New</option>
+            <option value="Used">Used</option>
+            <option value="Antique">Antique</option>
+            <option value="Excellent">Excellent</option>
           </select>
           Category:
           <div style={{ height: "16px" }}></div>
           <select name="condition" className="text" ref={categoryRef}>
             {categories.map(category => (
-              <option value={category.name}>{category.name}</option>
+              <option value={category._id}>{category.name}</option>
             ))}
           </select>
           Select Image File:
@@ -76,7 +104,8 @@ export default function NewPostPage() {
             type="file"
             name="myFile"
             onChange={e => {
-              fileRef.current = e.target.files[0];
+              fileRef.current = e.currentTarget.files[0];
+              console.log(e.currentTarget.files[0]);
             }}
           />
           <div style={{ height: "16px" }}></div>

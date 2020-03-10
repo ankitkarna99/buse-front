@@ -20,12 +20,13 @@ export default function LoginPage({ history }) {
         password: passwordRef.current.value
       })
       .then(response => {
+        console.log(response.data);
         makeToast("success", response.data.message);
         localStorage.setItem("token", response.data.token);
         history.push("/home");
       })
       .catch(err => {
-        console.log(err);
+        console.log(err.response.data.message);
         if (
           err &&
           err.response &&

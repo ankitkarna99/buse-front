@@ -6,9 +6,20 @@ import pp1 from "../Images/pp1.jpg";
 import bed from "../Images/bed.svg";
 import pp2 from "../Images/pp2.jpg";
 import { Link, withRouter } from "react-router-dom";
+import myAxios, { getAuthorizationHeaders, baseURL } from "../axios";
+import moment from "moment";
 
 function Notification({ history }) {
   const [showLogout, setShowLogout] = React.useState(false);
+  const [notifications, setNotifications] = React.useState([]);
+
+  React.useEffect(() => {
+    myAxios.get("/notification", getAuthorizationHeaders()).then(({ data }) => {
+      setNotifications(data);
+      console.log(data);
+    });
+    //eslint-disable-next-line
+  }, []);
   return (
     <div className="notifications">
       <div className="notification-header">
@@ -48,25 +59,17 @@ function Notification({ history }) {
           </div>
         </div>
       )}
-      <NotificationItem pp={pp1} userName="Aaryan KC" post={bed} time="1h" />
-      <NotificationItem pp={pp1} userName="Aaryan KC" post={bed} time="1h" />
-      <NotificationItem pp={pp1} userName="Aaryan KC" post={bed} time="1h" />
-      <NotificationItem pp={pp1} userName="Aaryan KC" post={bed} time="1h" />
-      <NotificationItem pp={pp1} userName="Aaryan KC" post={bed} time="1h" />
-      <NotificationItem pp={pp1} userName="Aaryan KC" post={bed} time="1h" />
-      <NotificationItem pp={pp1} userName="Aaryan KC" post={bed} time="1h" />
-      <NotificationItem pp={pp1} userName="Aaryan KC" post={bed} time="1h" />
-      <NotificationItem pp={pp1} userName="Aaryan KC" post={bed} time="1h" />
-      <NotificationItem pp={pp1} userName="Aaryan KC" post={bed} time="1h" />
-      <NotificationItem pp={pp1} userName="Aaryan KC" post={bed} time="1h" />
-      <NotificationItem pp={pp1} userName="Aaryan KC" post={bed} time="1h" />
-      <NotificationItem pp={pp1} userName="Aaryan KC" post={bed} time="1h" />
-      <NotificationItem
-        pp={pp2}
-        userName="Amik Bhandari"
-        post={bed}
-        time="2w"
-      />
+      {notifications.map(notification => (
+        <Link to={"/home/post/" + notification.post._id}>
+          <NotificationItem
+            key={notification._id}
+            pp={pp1}
+            userName={notification.user.name}
+            post={baseURL + notification.post.image}
+            time={moment(notification.createdAt).fromNow()}
+          />
+        </Link>
+      ))}
     </div>
   );
 }

@@ -1,44 +1,72 @@
 import React from "react";
 import NewComment from "../Components/NewComment";
 import Comments from "../Components/Comments";
-import bed from "../Images/bed.svg";
 import back from "../Images/back-arrow.svg";
 import Details from "../Components/Details";
+import myAxios, { getAuthorizationHeaders, baseURL } from "../axios";
 
-export default function PostDetailsPage() {
+export default function PostDetailsPage({ match }) {
+  const [post, setPost] = React.useState({});
+  const [comments, setComments] = React.useState([]);
+
+  const getComments = () => {
+    myAxios
+      .get("/comment/" + match.params.id, getAuthorizationHeaders())
+      .then(({ data }) => {
+        setComments(data);
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  };
+
+  React.useEffect(() => {
+    myAxios
+      .get("/post/" + match.params.id, getAuthorizationHeaders())
+      .then(({ data }) => {
+        setPost(data);
+      })
+      .catch(err => {
+        console.log(err);
+      });
+    getComments();
+    //eslint-disable-next-line
+  }, []);
   return (
     <div className="postDetails">
       <div className="back-post-grid">
         <img className="back-arrow" src={back} alt="" />
         <div>
-          <img className="post-image" src={bed} alt="" />
+          <img className="post-image" src={baseURL + post.image} alt="" />
           <div className="information">
             <Details title="General Details">
-              <div>Ad Id: 100</div>
-              <div>Ad Post Date: 10-01-2020</div>
-              <div>Ad Expiry Date: 10-02-2020</div>
+              <div>Ad Id: {post._id}</div>
+              <div>Ad Post Date: {post.createdAt}</div>
+              <div>Ad Expiry Date: {post.expiresIn}</div>
             </Details>
 
             <Details title="Seller Details">
-              <div>Sold By:Ankit Karna</div>
-              <div>Email:abc@gmail.com</div>
-              <div>Phone Number:9875431356</div>
-              <div>Location:Lokanthali,Bhaktapur</div>
+              <div>Sold By:{post.user && post.user.name}</div>
+              <div>Email:{post.user && post.user.email}</div>
+              <div>Phone Number:{post.user && post.user.phoneNumber}</div>
+              <div>Location:{post.address}</div>
             </Details>
             <Details title="Pricing Details">
-              <div> Price:25000</div>
-              <div> Condition:Brand New</div>
+              <div> Price:{post.price}</div>
+              <div> Condition:{post.condition}</div>
             </Details>
             <Details title="Description">
-              <div>
-                European Design (Euro) Khaat Khat Bed Comes with One Side
-                drawer. Size: 5ft x 6.5 ft Matress size (Matress not icluded )
-                Glossy shining quality finish.
-              </div>
+              <div>{post.description}</div>
             </Details>
 
-            <NewComment />
-            <Comments userName="Ankit Karna" comment="I want to buy." />
+            <NewComment id={post._id} getComments={getComments} />
+            {comments.map(comment => (
+              <Comments
+                key={comment._id}
+                userName={comment.user ? comment.user.name : ""}
+                comment={comment.text}
+              />
+            ))}
           </div>
         </div>
       </div>
