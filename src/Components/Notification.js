@@ -13,11 +13,16 @@ function Notification({ history }) {
   const [showLogout, setShowLogout] = React.useState(false);
   const [notifications, setNotifications] = React.useState([]);
 
-  React.useEffect(() => {
+  const getNotifications = () => {
     myAxios.get("/notification", getAuthorizationHeaders()).then(({ data }) => {
       setNotifications(data);
       console.log(data);
     });
+  };
+
+  React.useEffect(() => {
+    getNotifications();
+    setInterval(getNotifications, 20000);
     //eslint-disable-next-line
   }, []);
   return (
