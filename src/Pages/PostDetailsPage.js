@@ -4,8 +4,9 @@ import Comments from "../Components/Comments";
 import back from "../Images/back-arrow.svg";
 import Details from "../Components/Details";
 import myAxios, { getAuthorizationHeaders, baseURL } from "../axios";
+import { Link } from "react-router-dom";
 
-export default function PostDetailsPage({ match }) {
+export default function PostDetailsPage({ match, history }) {
   const [post, setPost] = React.useState({});
   const [comments, setComments] = React.useState([]);
 
@@ -32,12 +33,50 @@ export default function PostDetailsPage({ match }) {
     getComments();
     //eslint-disable-next-line
   }, []);
+
+  const deletePost = () => {
+    if (window.confirm("Are you sure you want to delete this?")) {
+      myAxios
+        .get("/post/delete/" + post._id, getAuthorizationHeaders())
+        .then(({ data }) => {
+          history.push("/home");
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    }
+  };
   return (
     <div className="postDetails">
       <div className="back-post-grid">
-        <img className="back-arrow" src={back} alt="" />
-        <div>
-          <img className="post-image" src={baseURL + post.image} alt="" />
+        <Link to="/home">
+          <img className="back-arrow" src={back} alt="" />
+        </Link>
+        <div style={{ position: "relative" }}>
+          {post && post.canDelete && (
+            <button
+              style={{
+                position: "absolute",
+                top: 0,
+                right: 0,
+                border: "none",
+                background: "red",
+                color: "white",
+                padding: "0.5rem 1rem",
+                borderRadius: "4px",
+                cursor: "pointer"
+              }}
+              onClick={deletePost}
+            >
+              Delete Post
+            </button>
+          )}
+          <img
+            className="post-image"
+            style={{ width: "40%", margin: "0 auto", display: "block" }}
+            src={baseURL + post.image}
+            alt=""
+          />
           <div className="information">
             <Details title="General Details">
               <div>Ad Id: {post._id}</div>
