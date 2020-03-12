@@ -9,9 +9,11 @@ import PostDetailsPage from "./PostDetailsPage";
 import NewPostPage from "./NewPostPage";
 import myAxios, { getAuthorizationHeaders } from "../axios";
 import SearchPage from "./SearchPage";
+import AddProfilePicturePage from "./AddProfilePicturePage";
 
 export default function HomeRouter({ history }) {
   const [searchResult, setSearchResult] = React.useState([]);
+  const [profilePicture, setProfilePicture] = React.useState("");
 
   const search = query => {
     myAxios
@@ -25,15 +27,37 @@ export default function HomeRouter({ history }) {
       });
   };
 
+  const getProfilePicture = () => {
+    myAxios
+      .get("/user/aboutMe", getAuthorizationHeaders())
+      .then(({ data }) => {
+        setProfilePicture(data.image);
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  };
+
+  React.useEffect(() => {
+    getProfilePicture();
+  }, []);
+
   return (
     <div className="sections">
       <div id="left-section">
-        <Header search={search}></Header>
+        <Header search={search} profilePicture={profilePicture}></Header>
         <Switch>
           <Route path="/home" component={HomePage} exact />
           <Route path="/home/profile" component={ProfilePage} exact />
           <Route path="/home/post/:id" component={PostDetailsPage} exact />
           <Route path="/home/new" component={NewPostPage} exact />
+          <Route
+            path="/home/addProfilePicture"
+            render={() => (
+              <AddProfilePicturePage setProfilePicture={setProfilePicture} />
+            )}
+            exact
+          />
           <Route
             path="/home/search"
             render={() => <SearchPage searchResult={searchResult} />}
@@ -47,7 +71,7 @@ export default function HomeRouter({ history }) {
           </div>
         </Link>
       </div>
-      <Notification />
+      <Notification profilePicture={profilePicture} />
     </div>
   );
 }

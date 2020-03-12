@@ -5,7 +5,7 @@ import { baseURL } from "../axios";
 
 const SearchPage = ({ searchResult }) => {
   return (
-    <div className="posts">
+    <div className="posts" style={{ marginTop: "2.5rem" }}>
       {searchResult.map(post => (
         <Link key={post._id} to={"/home/post/" + post._id}>
           <Post

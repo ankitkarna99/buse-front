@@ -8,6 +8,7 @@ import { Link } from "react-router-dom";
 export default function ProfilePage() {
   const [posts, setPosts] = React.useState([]);
   const [name, setName] = React.useState("");
+  const [profilePicture, setProfilePicture] = React.useState("");
 
   React.useEffect(() => {
     myAxios
@@ -22,6 +23,7 @@ export default function ProfilePage() {
       .get("/user/aboutMe", getAuthorizationHeaders())
       .then(({ data }) => {
         setName(data.name);
+        setProfilePicture(data.image);
       })
       .catch(err => {
         console.log(err);
@@ -30,7 +32,7 @@ export default function ProfilePage() {
   return (
     <div className="profilePage">
       <div className="profiles">
-        <Profile name={name} />
+        <Profile name={name} profilePicture={profilePicture} />
         <div></div>
       </div>
       <div className="posts">

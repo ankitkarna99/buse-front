@@ -1,11 +1,24 @@
 import React from "react";
+import { baseURL } from "../axios";
 
-export default function NotificationItem({ pp, userName, post, time }) {
+export default function NotificationItem({
+  pp,
+  text,
+  post,
+  time,
+  profilePicture
+}) {
   return (
     <div className="notification">
-      <img className="noti-pp" src={pp} alt="" />
+      <img
+        className="noti-pp"
+        src={profilePicture ? baseURL + profilePicture : pp}
+        alt=""
+      />
       <span>
-        <strong> {userName} </strong> commented on your post. {time}
+        <strong>{text.split("commented")[0]}</strong>
+        commented{text.split("commented")[1] + " "}
+        {time}
       </span>
       <img className="noti-post" src={post} alt="" />
     </div>

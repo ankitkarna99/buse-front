@@ -85,14 +85,14 @@ export default function PostDetailsPage({ match, history }) {
             </Details>
 
             <Details title="Seller Details">
-              <div>Sold By:{post.user && post.user.name}</div>
-              <div>Email:{post.user && post.user.email}</div>
-              <div>Phone Number:{post.user && post.user.phoneNumber}</div>
-              <div>Location:{post.address}</div>
+              <div>Sold By: {post.user && post.user.name}</div>
+              <div>Email: {post.user && post.user.email}</div>
+              <div>Phone Number: {post.user && post.user.phoneNumber}</div>
+              <div>Location: {post.address}</div>
             </Details>
             <Details title="Pricing Details">
-              <div> Price:{post.price}</div>
-              <div> Condition:{post.condition}</div>
+              <div> Price: Rs. {post.price}</div>
+              <div> Condition: {post.condition}</div>
             </Details>
             <Details title="Description">
               <div>{post.description}</div>

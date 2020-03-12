@@ -9,7 +9,7 @@ import { Link, withRouter } from "react-router-dom";
 import myAxios, { getAuthorizationHeaders, baseURL } from "../axios";
 import moment from "moment";
 
-function Notification({ history }) {
+function Notification({ history, profilePicture }) {
   const [showLogout, setShowLogout] = React.useState(false);
   const [notifications, setNotifications] = React.useState([]);
 
@@ -32,7 +32,11 @@ function Notification({ history }) {
           <strong>Notifications</strong>
         </span>
         <Link to="/home/profile">
-          <img id="pp" src={profilePic} alt="" />
+          <img
+            id="pp"
+            src={profilePicture ? baseURL + profilePicture : profilePic}
+            alt=""
+          />
         </Link>
         <img
           id="drop-down"
@@ -69,8 +73,9 @@ function Notification({ history }) {
           <NotificationItem
             key={notification._id}
             pp={pp1}
-            userName={notification.user.name}
+            text={notification.text}
             post={baseURL + notification.post.image}
+            profilePicture={notification.profilePicture}
             time={moment(notification.createdAt).fromNow()}
           />
         </Link>
